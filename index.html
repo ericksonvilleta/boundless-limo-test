@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ExampleIQ | Pro Booking Form</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css">
+    
+    <style>
+        :root {
+            --gold: #d4b563;
+            --gold-light: #fdfaf0;
+            --text-main: #333;
+            --text-muted: #888;
+            --border: #ddd;
+            --radius: 8px;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #fcfcfc;
+            display: flex; justify-content: center; padding: 10px; color: var(--text-main);
+        }
+
+        .form-card {
+            background: #fff; width: 100%; max-width: 460px; padding: 25px;
+            border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            margin: 10px auto; overflow: visible; display: flex; flex-direction: column;
+        }
+
+        .logo {
+            text-align: center; color: #5c6bc0; font-weight: bold; font-size: 24px;
+            margin-bottom: 25px; display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+
+        h1 { font-size: 22px; font-weight: 400; margin-bottom: 30px; line-height: 1.2; }
+
+        .trip-type {
+            display: grid; grid-template-columns: 1fr 1fr;
+            border: 1px solid var(--border); border-radius: 6px;
+            margin-bottom: 25px; overflow: hidden;
+        }
+
+        .type-btn {
+            padding: 12px; text-align: center; background: #fff; border: none;
+            cursor: pointer; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+
+        .type-btn.active { border: 2.5px solid var(--gold); background: var(--gold-light); color: var(--gold); font-weight: 600; }
+
+        .section-label { display: block; font-weight: bold; font-size: 15px; margin: 25px 0 10px 0; }
+
+        .field-group { position: relative; margin-bottom: 32px; width: 100%; }
+
+        .floating-label {
+            position: absolute; top: -10px; left: 12px; background: #fff; padding: 0 6px;
+            font-size: 12px; color: var(--text-muted); z-index: 50; pointer-events: none;
+        }
+
+        .field-icon {
+            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+            color: var(--gold); font-size: 15px; z-index: 20;
+        }
+
+        input {
+            width: 100%; padding: 12px 12px 12px 42px; border: 1px solid var(--border);
+            border-radius: 6px; font-size: 14px; outline: none; background: white;
+            height: 52px; position: relative; z-index: 10;
+        }
+
+        /* HIDE NATIVE DATE/TIME ICONS BUT KEEP CLICKABLE */
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            background: transparent;
+            bottom: 0;
+            color: transparent;
+            cursor: pointer;
+            height: auto;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: auto;
+            z-index: 40; /* Sits above the text but below floating labels */
+        }
+
+        .iti__country-list { z-index: 100 !important; width: 400px; }
+        #phone_input { padding-left: 95px !important; }
+
+        .remove-stop {
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            color: #d9534f; cursor: pointer; z-index: 30; font-size: 16px; padding: 5px;
+        }
+
+        .grid-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
+
+        .pill-row { display: flex; gap: 8px; margin-bottom: 12px; }
+        .pill { padding: 4px 15px; border: 1.5px solid var(--border); border-radius: 20px; font-size: 13px; color: var(--text-muted); cursor: pointer; }
+        .pill.active { border-color: var(--gold); color: var(--gold); font-weight: bold; }
+
+        .add-stop-btn { color: var(--gold); font-size: 13px; cursor: pointer; text-decoration: none; margin-bottom: 15px; display: inline-block; font-weight: 500; }
+        
+        .trip-info-box {
+            background: var(--gold-light); border: 1px dashed var(--gold);
+            padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 20px;
+            display: none; color: var(--gold); font-weight: 500;
+        }
+
+        .contact-note { font-size: 12px; color: #d9534f; margin: 0 0 20px 0; display: none; line-height: 1.4; font-weight: 500; }
+        .collapsible { display: none; width: 100%; }
+        .collapsible.show { display: block; }
+
+        .passenger-container {
+            display: flex; align-items: center; border: 1px solid var(--border);
+            border-radius: 6px; width: 140px; height: 52px; position: relative;
+        }
+        #u_passengers { border: none; text-align: left; padding-left: 42px; width: 100%; background: transparent; }
+        .stepper-btns { position: absolute; right: 12px; display: flex; flex-direction: column; gap: 4px; z-index: 50; }
+        .stepper-btns i { font-size: 14px; color: var(--gold); cursor: pointer; padding: 2px; }
+
+        .btn-continue {
+            width: 100%; background-color: var(--gold); color: white; border: none;
+            padding: 16px; border-radius: 6px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px;
+        }
+
+        @media (max-width: 440px) { .grid-row { grid-template-columns: 1fr; gap: 0; } }
+    </style>
+</head>
+<body>
+
+<div class="form-card">
+    <div class="logo"><i class="fas fa-tachometer-alt"></i> ExampleIQ</div>
+    <h1 id="greeting">Let's get you on your way!</h1>
+
+    <div class="trip-type">
+        <button class="type-btn active" onclick="setTripType(this)"><i class="fas fa-arrow-circle-right"></i> One-way</button>
+        <button class="type-btn" onclick="setTripType(this)"><i class="fas fa-hourglass-half"></i> Hourly</button>
+    </div>
+
+    <label class="section-label">Pickup</label>
+    <div class="grid-row">
+        <div class="field-group">
+            <span class="floating-label">Date</span>
+            <i class="far fa-calendar-alt field-icon"></i>
+            <input type="date" id="p_date" value="2026-03-09">
+        </div>
+        <div class="field-group">
+            <span class="floating-label">Time</span>
+            <i class="far fa-clock field-icon"></i>
+            <input type="time" id="p_time" value="15:00">
+        </div>
+    </div>
+
+    <div class="pill-row">
+        <div class="pill active" onclick="togglePill(this, 'pickup')">Location</div>
+        <div class="pill" onclick="togglePill(this, 'pickup')">Airport</div>
+    </div>
+    <div class="field-group">
+        <span class="floating-label" id="pickup_label">Location</span>
+        <i class="fas fa-map-marker-alt field-icon"></i>
+        <input type="text" id="pickup_location" placeholder="Enter pickup address">
+    </div>
+
+    <span class="add-stop-btn" onclick="addStop()"><i class="fas fa-plus"></i> Add a stop</span>
+    <div id="stops-container"></div>
+
+    <label class="section-label">Drop off</label>
+    <div class="pill-row">
+        <div class="pill active" onclick="togglePill(this, 'dropoff')">Location</div>
+        <div class="pill" onclick="togglePill(this, 'dropoff')">Airport</div>
+    </div>
+    <div class="field-group">
+        <span class="floating-label" id="dropoff_label">Location</span>
+        <i class="fas fa-map-marker-alt field-icon"></i>
+        <input type="text" id="dropoff_location" placeholder="Enter destination address">
+    </div>
+
+    <div id="trip-stats" class="trip-info-box"></div>
+
+    <label class="section-label">Contact Information</label>
+    <div class="field-group">
+        <input type="tel" id="phone_input" placeholder="000-000-0000">
+    </div>
+
+    <p id="phone_warning" class="contact-note">We don't have that phone number on file. Please provide additional contact information.</p>
+
+    <div id="extra-info" class="collapsible show">
+        <div class="grid-row">
+            <div class="field-group"><span class="floating-label">First name</span><i class="fas fa-user field-icon"></i><input type="text" id="f_name" placeholder="First name"></div>
+            <div class="field-group"><span class="floating-label">Last name</span><i class="fas fa-user field-icon"></i><input type="text" id="l_name" placeholder="Last name"></div>
+        </div>
+        <div class="field-group"><span class="floating-label">Email</span><i class="fas fa-at field-icon"></i><input type="email" id="u_email" placeholder="name@example.com"></div>
+    </div>
+
+    <p class="section-label" style="font-weight: normal; font-size: 13px; margin-bottom: 8px;">How many passengers are expected for the trip?</p>
+    <div class="field-group">
+        <span class="floating-label"># Passengers</span>
+        <div class="passenger-container">
+            <i class="fas fa-hashtag field-icon" style="top:50%"></i>
+            <input type="text" id="u_passengers" value="1" readonly>
+            <div class="stepper-btns"><i class="fas fa-chevron-up" onclick="changeQty(1)"></i><i class="fas fa-chevron-down" onclick="changeQty(-1)"></i></div>
+        </div>
+    </div>
+
+    <button class="btn-continue" onclick="processBooking()">Continue</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXwXYwHNzOuV6JeWSkXOHdsLyhcNkg_Tg&libraries=places" async defer></script>
+
+<script>
+    // SAVED APPS SCRIPT URL
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbw3YGzzVG1D_uFz5Rr6AKpwLgVDzmRTiL39-zw5aXmF49OHjaG1pJMOc_GuVk4ZP-Av/exec';
+    
+    const iti = window.intlTelInput(document.getElementById('phone_input'), {
+        initialCountry: "us", separateDialCode: true,
+        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js",
+    });
+
+    window.onload = function() {
+        initAutocomplete('pickup_location');
+        initAutocomplete('dropoff_location');
+    };
+
+    function initAutocomplete(id) {
+        const input = document.getElementById(id);
+        const auto = new google.maps.places.Autocomplete(input);
+        auto.addListener('place_changed', calculateTrip);
+    }
+
+    function addStop() {
+        const id = 'stop_' + Date.now();
+        const html = `
+            <div class="field-group" id="group_${id}">
+                <span class="floating-label">Stop</span>
+                <i class="fas fa-map-pin field-icon"></i>
+                <input type="text" id="${id}" placeholder="Enter stop address">
+                <i class="fas fa-times remove-stop" onclick="removeStop('group_${id}')"></i>
+            </div>`;
+        document.getElementById('stops-container').insertAdjacentHTML('beforeend', html);
+        initAutocomplete(id);
+    }
+
+    function removeStop(id) { 
+        document.getElementById(id).remove(); 
+        calculateTrip(); 
+    }
+
+    function calculateTrip() {
+        const origin = document.getElementById('pickup_location').value;
+        const destination = document.getElementById('dropoff_location').value;
+        if (!origin || !destination) return;
+
+        const service = new google.maps.DistanceMatrixService();
+        service.getDistanceMatrix({
+            origins: [origin], 
+            destinations: [destination],
+            travelMode: 'DRIVING', 
+            unitSystem: google.maps.UnitSystem.IMPERIAL
+        }, (response, status) => {
+            if (status === 'OK') {
+                const data = response.rows[0].elements[0];
+                const stats = document.getElementById('trip-stats');
+                stats.style.display = 'block';
+                stats.innerHTML = `<i class="fas fa-info-circle"></i> Distance: ${data.distance.text} | Est. Travel Time: ${data.duration.text}`;
+            }
+        });
+    }
+
+    function changeQty(amt) {
+        let el = document.getElementById('u_passengers');
+        let val = parseInt(el.value) || 1;
+        el.value = Math.max(1, val + amt);
+    }
+
+    function togglePill(el, type) {
+        el.parentElement.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById(type + '_label').innerText = el.innerText;
+    }
+
+    function setTripType(el) {
+        document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    document.getElementById('phone_input').addEventListener('input', (e) => {
+        let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
+        e.target.value = !x[2] ? x[1] : x[1] + '-' + x[2] + (x[3] ? '-' + x[3] : '');
+        if (e.target.value.length === 12) checkUser(iti.getNumber());
+    });
+
+    async function checkUser(phone) {
+        const resp = await fetch(`${scriptURL}?phone=${encodeURIComponent(phone)}`);
+        const res = await resp.json();
+        const greeting = document.getElementById('greeting');
+        const warning = document.getElementById('phone_warning');
+        const extra = document.getElementById('extra-info');
+
+        if (res.found) {
+            greeting.innerText = `Welcome back, ${res.firstName}!`;
+            greeting.style.color = '#d4af37';
+            warning.style.display = 'none';
+            extra.classList.remove('show');
+        } else {
+            greeting.innerText = "Let's get you on your way!";
+            warning.style.display = 'block';
+            extra.classList.add('show');
+        }
+    }
+
+    async function processBooking() {
+        const data = {
+            date: document.getElementById('p_date').value,
+            time: document.getElementById('p_time').value,
+            pickup: document.getElementById('pickup_location').value,
+            dropoff: document.getElementById('dropoff_location').value,
+            phone: iti.getNumber(),
+            firstName: document.getElementById('f_name').value,
+            lastName: document.getElementById('l_name').value,
+            email: document.getElementById('u_email').value,
+            passengers: document.getElementById('u_passengers').value
+        };
+        fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) })
+        .then(() => alert("Booking Sent!"));
+    }
+</script>
+</body>
+</html>
